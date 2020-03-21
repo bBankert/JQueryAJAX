@@ -1,0 +1,123 @@
+﻿@model IEnumerable<TestingApplication.Models.Movie>
+
+@{
+    Layout = "~/Views/Shared/_layout.cshtml";
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+</head>
+<body>
+    <div class="col-9 offset-1">
+        @Html.ActionLink("Create a Movie", "Create", "Movie", null, new { @class = "btn btn-primary", id = "createButton" })
+        <table class="table table-dark">
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.Title)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Rating)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Genre)
+                </th>
+                <th></th>
+            </tr>
+
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Title)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Rating)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Genre)
+                    </td>
+                    <td>
+                        @Html.ActionLink("Details", "Index", "Movie", new { id = item.ID }, new { @class = "btn btn-sm btn-info details-button" })
+                        @Html.ActionLink("Update Movie", "Update", "Movie", new { id = item.ID }, new { @class = "btn btn-sm btn-primary update-button" })
+                    </td>
+                </tr>
+            }
+        </table>
+    </div>
+
+
+    <!--Modal-->
+    <div class="modal fade" id="generalModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><!--Place the dynamic title here--></h5>
+                    <button type="button" class="close" data-dismiss="modal">
+                        <span>&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!--Place the dynamic create form-->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $('#createButton').click(function (event) {
+            event.preventDefault();
+             $.ajax({
+                type: "GET",
+                url: '@Url.Action("Create","Movie")',
+                success: function (response) {
+                    $('#generalModal').modal('toggle');
+                    $('#generalModal .modal-title').html('Create');
+                    $('#generalModal .modal-body').html(response);
+                }
+            });
+        });
+
+        $('.update-button').click(function (event) {
+            event.preventDefault();
+            var href = event.target.href;
+            var movieId= href.split('/');
+            movieId = movieId.reverse();
+            movieId = movieId[0];
+            $.ajax({
+                type: "GET",
+                url: '@Url.Action("Update","Movie")',
+                data: { 'id' : movieId},
+                success: function (response) {
+                    $('#generalModal').modal('toggle');
+                    $('#generalModal .modal-title').html('Update');
+                    $('#generalModal .modal-body').html(response);
+                }
+            });
+
+        });
+
+        $('.details-button').click(function (event) {
+            event.preventDefault();
+            var href = event.target.href;
+            var movieId = href.split('/');
+            movieId = movieId.reverse();
+            movieId = movieId[0];
+            $.ajax({
+                type: "GET",
+                url: '@Url.Action("Index","Movie")',
+                data: { 'id': movieId },
+                success: function (response) {
+                    $('#generalModal').modal('toggle');
+                    $('#generalModal .modal-title').html('Details');
+                    $('#generalModal .modal-body').html(response);
+                }
+            });
+        });
+
+    </script>
+</body>
+</html>
